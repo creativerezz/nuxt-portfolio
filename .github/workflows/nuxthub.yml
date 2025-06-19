@@ -5,6 +5,9 @@ jobs:
   deploy:
     name: "Deploy to NuxtHub"
     runs-on: ubuntu-latest
+-    environment:
+-      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+-      url: ${{ steps.deploy.outputs.deployment-url }}
     permissions:
       contents: read
       id-token: write
@@ -21,13 +24,22 @@ jobs:
           node-version: 22
           cache: 'pnpm'
 
-      - name: Ensure NuxtHub module is installed
-        run: pnpx nuxthub@latest ensure
-
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build & Deploy to NuxtHub
-        uses: nuxt-hub/action@v2
-        with:
-          project-key: rezajafar-fqq6
+-      - name: Ensure NuxtHub module is installed
+-        run: pnpx nuxthub@latest ensure
+-
+-      - name: Build application
+-        run: pnpm build
+
+-      - name: Deploy to NuxtHub
+-        uses: nuxt-hub/action@v1
+-        id: deploy
+-        with:
+-          project-key: <YOUR-PROJECT-KEY>
+
++      - name: Build & Deploy to NuxtHub
++        uses: nuxt-hub/action@v2
++        with:
++          project-key: <YOUR-PROJECT-KEY>
